@@ -1,6 +1,6 @@
 // ========================================
 // AMA'z ULTRA - المنصة الفائقة الاحترافية
-// الإصدار 6.0 - مع سياسة الخصوصية وشروط الاستخدام والدعم الفني
+// الإصدار 6.0 - مع Firebase والتخزين السحابي
 // ========================================
 
 // ========================================
@@ -70,40 +70,137 @@ let nextId = { achievements: 5, projects: 4, blog: 3, images: 1, messages: 2, lo
 let currentLang = 'ar';
 
 // ========================================
-// تحميل وحفظ البيانات
+// تحميل وحفظ البيانات (مع Firebase)
 // ========================================
-document.addEventListener('DOMContentLoaded', function() {
-    loadAllData();
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadAllData();
     updateAllTexts();
-    loadPage('home');
+    await loadPage('home');
     setupHamburger();
     addLanguageSelector();
     addThemeToggle();
     recordVisit();
-    setupPremiumChatbot();
-    initParticles();
-    setupMusicPlayer();
     setupSearch();
     setupShare();
     setupNewsletter();
     setupDarkModeFloat();
     initAOS();
     hidePreloader();
-    setupCustomCursor();
     setupNotifications();
+    setupScrollTop();
+    
+    // تفعيل AOS
+    if (typeof AOS !== 'undefined') {
+        AOS.init({ duration: 800, once: true, offset: 100, easing: 'ease-in-out' });
+    }
 });
 
-function loadAllData() {
+// ========================================
+// دوال Firebase (التخزين السحابي)
+// ========================================
+
+// تحميل البيانات من Firebase
+async function loadSiteDataFromFirebase() {
+    if (!window.db) {
+        console.log("⚠️ Firebase غير جاهز، نستخدم localStorage");
+        return false;
+    }
+    
+    try {
+        const docRef = window.db.collection('siteData').doc('main');
+        const doc = await docRef.get();
+        
+        if (doc.exists) {
+            const firebaseData = doc.data();
+            Object.assign(siteData, firebaseData);
+            console.log("✅ تم تحميل البيانات من Firebase");
+            return true;
+        } else {
+            await saveSiteDataToFirebase();
+            console.log("📤 تم حفظ البيانات لأول مرة في Firebase");
+            return true;
+        }
+    } catch (error) {
+        console.error("❌ خطأ في تحميل البيانات من Firebase:", error);
+        return false;
+    }
+}
+
+// حفظ البيانات في Firebase
+async function saveSiteDataToFirebase() {
+    if (!window.db) return false;
+    
+    try {
+        const dataToSave = {
+            ...siteData,
+            stats: {
+                ...siteData.stats,
+                lastUpdated: new Date().toISOString()
+            }
+        };
+        
+        await window.db.collection('siteData').doc('main').set(dataToSave);
+        console.log("✅ تم حفظ البيانات في Firebase");
+        return true;
+    } catch (error) {
+        console.error("❌ خطأ في حفظ البيانات:", error);
+        return false;
+    }
+}
+
+// دوال مزامنة الأقسام
+async function syncAchievementsToFirebase() {
+    if (!window.db) return;
+    try {
+        await window.db.collection('siteData').doc('main').update({
+            'achievements': siteData.achievements
+        });
+    } catch (error) {
+        await saveSiteDataToFirebase();
+    }
+}
+
+async function syncProjectsToFirebase() {
+    if (!window.db) return;
+    try {
+        await window.db.collection('siteData').doc('main').update({
+            'projects': siteData.projects
+        });
+    } catch (error) {
+        await saveSiteDataToFirebase();
+    }
+}
+
+async function syncBlogToFirebase() {
+    if (!window.db) return;
+    try {
+        await window.db.collection('siteData').doc('main').update({
+            'blog': siteData.blog
+        });
+    } catch (error) {
+        await saveSiteDataToFirebase();
+    }
+}
+
+// ========================================
+// تحميل وحفظ البيانات المحلية
+// ========================================
+async function loadAllData() {
     const savedUsers = localStorage.getItem('amaz_users');
     const savedSiteData = localStorage.getItem('amaz_siteData');
     const savedCurrentUser = localStorage.getItem('amaz_currentUser');
+    
     if (savedUsers) users = JSON.parse(savedUsers);
     if (savedSiteData) siteData = JSON.parse(savedSiteData);
     if (savedCurrentUser) currentUser = JSON.parse(savedCurrentUser);
     if (localStorage.getItem('amaz_nextId')) nextId = JSON.parse(localStorage.getItem('amaz_nextId'));
     if (localStorage.getItem('amaz_language')) currentLang = localStorage.getItem('amaz_language');
+    
     const savedTheme = localStorage.getItem('amaz_theme');
     if (savedTheme === 'dark') document.body.classList.add('dark-mode');
+    
+    // تحميل من Firebase
+    await loadSiteDataFromFirebase();
 }
 
 function saveAllData() {
@@ -112,6 +209,9 @@ function saveAllData() {
     localStorage.setItem('amaz_currentUser', JSON.stringify(currentUser));
     localStorage.setItem('amaz_nextId', JSON.stringify(nextId));
     updateStats();
+    
+    // حفظ في Firebase
+    saveSiteDataToFirebase();
 }
 
 function updateStats() {
@@ -207,7 +307,7 @@ function uploadImageForItem(type, id) {
 // ========================================
 // عرض الصفحات الرئيسية
 // ========================================
-function loadPage(page) {
+async function loadPage(page) {
     if (siteData.settings.maintenanceMode && (!currentUser || currentUser.role === 'viewer')) {
         document.getElementById('content-container').innerHTML = `<div style="text-align:center; padding:50px;"><h1>🔧 ${siteData.settings.siteName}</h1><p>${siteData.settings.maintenanceMessage}</p></div>`;
         return;
@@ -349,21 +449,6 @@ function loadPage(page) {
                 </div>
                 
                 <div class="legal-section">
-                    <h2>🍪 ملفات تعريف الارتباط (Cookies)</h2>
-                    <p>نستخدم ملفات تعريف الارتباط لتحسين تجربتك على موقعنا. يمكنك التحكم في إعدادات cookies من خلال متصفحك.</p>
-                </div>
-                
-                <div class="legal-section">
-                    <h2>🔗 روابط خارجية</h2>
-                    <p>قد يحتوي موقعنا على روابط لمواقع خارجية. نحن غير مسؤولين عن ممارسات الخصوصية لتلك المواقع.</p>
-                </div>
-                
-                <div class="legal-section">
-                    <h2>👦 خصوصية الأطفال</h2>
-                    <p>موقعنا لا يستهدف الأطفال تحت سن 13 عاماً. نحن لا نجمع معلومات عن قصد من الأطفال.</p>
-                </div>
-                
-                <div class="legal-section">
                     <h2>📧 الاتصال بنا</h2>
                     <p>إذا كان لديك أي أسئلة حول سياسة الخصوصية، يرجى التواصل معنا عبر:</p>
                     <p>📧 البريد الإلكتروني: <a href="mailto:${siteData.contact.email}">${siteData.contact.email}</a></p>
@@ -394,22 +479,6 @@ function loadPage(page) {
                 <div class="legal-section">
                     <h2>📝 المحتوى</h2>
                     <p>جميع المحتويات المنشورة على هذا الموقع (بما في ذلك النصوص والصور والتصاميم) هي ملك لـ AMA'z أو مرخصة لنا. لا يجوز نسخ أو توزيع أو استخدام أي محتوى بدون إذن كتابي مسبق.</p>
-                </div>
-                
-                <div class="legal-section">
-                    <h2>🚫 السلوك الممنوع</h2>
-                    <p>يُمنع استخدام الموقع للأغراض التالية:</p>
-                    <ul>
-                        <li>نشر محتوى غير قانوني أو مسيء أو ضار.</li>
-                        <li>محاولة اختراق أمن الموقع أو حسابات المستخدمين.</li>
-                        <li>إرسال رسائل غير مرغوب فيها (Spam).</li>
-                        <li>انتحال شخصية آخرين.</li>
-                    </ul>
-                </div>
-                
-                <div class="legal-section">
-                    <h2>⚖️ إخلاء المسؤولية</h2>
-                    <p>نحن لا نضمن أن الموقع سيكون متاحاً دون انقطاع أو خالياً من الأخطاء. نقدم الموقع "كما هو" دون أي ضمانات.</p>
                 </div>
                 
                 <div class="legal-section">
@@ -473,11 +542,6 @@ function loadPage(page) {
                     <div class="faq-item">
                         <h3>💡 كيف يمكنني تغيير لون الموقع (الوضع الداكن)؟</h3>
                         <p>اضغط على زر 🌙/☀️ في أعلى الشاشة للتبديل بين الوضع الفاتح والداكن.</p>
-                    </div>
-                    
-                    <div class="faq-item">
-                        <h3>💡 هل موقعي آمن؟</h3>
-                        <p>نعم، نستخدم أحدث تقنيات التشفير والحماية لضمان أمان بياناتك.</p>
                     </div>
                 </div>
                 
@@ -599,7 +663,7 @@ function logout() {
 }
 
 // ========================================
-// لوحة القيادة (مختصرة للطول)
+// لوحة القيادة
 // ========================================
 function showAdminDashboard() {
     if (!currentUser) return showLoginForm();
@@ -736,9 +800,6 @@ function deleteUser(userId) {
     }
 }
 
-// ========================================
-// إدارة المحتوى (مختصرة للطول)
-// ========================================
 function showContentManagement() {
     if (!hasPermission('manage_content') && !hasPermission('edit_content') && currentUser?.role !== 'owner') {
         return `<div style="text-align:center; padding:50px; color:red;">⛔ غير مصرح لك</div>`;
@@ -810,7 +871,9 @@ function addAchievement() {
     if (text) {
         siteData.achievements.list.push({ id: nextId.achievements++, text: text, image: "", order: siteData.achievements.list.length + 1 });
         saveAllData();
+        syncAchievementsToFirebase();
         addLogEntry(`إضافة إنجاز`);
+        alert('✅ تم إضافة الإنجاز');
         loadPage('admin');
         switchAdminTab('content');
     } else alert('❌ أدخل النص');
@@ -821,7 +884,9 @@ function deleteAchievement(id) {
         siteData.achievements.list = siteData.achievements.list.filter(i => i.id !== id);
         siteData.achievements.list.forEach((item, idx) => item.order = idx + 1);
         saveAllData();
+        syncAchievementsToFirebase();
         addLogEntry(`حذف إنجاز`);
+        alert('✅ تم حذف الإنجاز');
         loadPage('admin');
         switchAdminTab('content');
     }
@@ -834,7 +899,9 @@ function addProject() {
     if (name && desc && year) {
         siteData.projects.list.push({ id: nextId.projects++, name, desc, year, image: "", order: siteData.projects.list.length + 1 });
         saveAllData();
+        syncProjectsToFirebase();
         addLogEntry(`إضافة مشروع: ${name}`);
+        alert('✅ تم إضافة المشروع');
         loadPage('admin');
         switchAdminTab('content');
     } else alert('❌ ملء جميع الحقول');
@@ -849,9 +916,9 @@ function updateProject(id) {
         const fileInput = document.getElementById(`image_project_${id}`);
         if (fileInput && fileInput.files[0]) {
             const reader = new FileReader();
-            reader.onload = function(e) { project.image = e.target.result; saveAllData(); alert('✅ تم التحديث مع الصورة'); loadPage('admin'); switchAdminTab('content'); };
+            reader.onload = function(e) { project.image = e.target.result; saveAllData(); syncProjectsToFirebase(); alert('✅ تم التحديث مع الصورة'); loadPage('admin'); switchAdminTab('content'); };
             reader.readAsDataURL(fileInput.files[0]);
-        } else { saveAllData(); alert('✅ تم التحديث'); loadPage('admin'); switchAdminTab('content'); }
+        } else { saveAllData(); syncProjectsToFirebase(); alert('✅ تم التحديث'); loadPage('admin'); switchAdminTab('content'); }
     }
 }
 
@@ -860,7 +927,9 @@ function deleteProject(id) {
         siteData.projects.list = siteData.projects.list.filter(p => p.id !== id);
         siteData.projects.list.forEach((item, idx) => item.order = idx + 1);
         saveAllData();
+        syncProjectsToFirebase();
         addLogEntry(`حذف مشروع`);
+        alert('✅ تم حذف المشروع');
         loadPage('admin');
         switchAdminTab('content');
     }
@@ -872,7 +941,9 @@ function addBlogPost() {
     if (title && content) {
         siteData.blog.posts.push({ id: nextId.blog++, title, content, date: new Date().toISOString().split('T')[0], image: "", comments: [], order: siteData.blog.posts.length + 1 });
         saveAllData();
+        syncBlogToFirebase();
         addLogEntry(`إضافة تدوينة: ${title}`);
+        alert('✅ تم إضافة التدوينة');
         loadPage('admin');
         switchAdminTab('content');
     } else alert('❌ أدخل عنوان ومحتوى');
@@ -886,9 +957,9 @@ function updateBlogPost(id) {
         const fileInput = document.getElementById(`image_blog_${id}`);
         if (fileInput && fileInput.files[0]) {
             const reader = new FileReader();
-            reader.onload = function(e) { post.image = e.target.result; saveAllData(); alert('✅ تم التحديث مع الصورة'); loadPage('admin'); switchAdminTab('content'); };
+            reader.onload = function(e) { post.image = e.target.result; saveAllData(); syncBlogToFirebase(); alert('✅ تم التحديث مع الصورة'); loadPage('admin'); switchAdminTab('content'); };
             reader.readAsDataURL(fileInput.files[0]);
-        } else { saveAllData(); alert('✅ تم التحديث'); loadPage('admin'); switchAdminTab('content'); }
+        } else { saveAllData(); syncBlogToFirebase(); alert('✅ تم التحديث'); loadPage('admin'); switchAdminTab('content'); }
     }
 }
 
@@ -897,15 +968,14 @@ function deleteBlogPost(id) {
         siteData.blog.posts = siteData.blog.posts.filter(p => p.id !== id);
         siteData.blog.posts.forEach((item, idx) => item.order = idx + 1);
         saveAllData();
+        syncBlogToFirebase();
         addLogEntry(`حذف تدوينة`);
+        alert('✅ تم حذف التدوينة');
         loadPage('admin');
         switchAdminTab('content');
     }
 }
 
-// ========================================
-// إدارة الوارد
-// ========================================
 function showCommentsAndIncoming() {
     if (!hasPermission('manage_inbox') && currentUser?.role !== 'owner') return `<div style="text-align:center; padding:50px; color:red;">⛔ غير مصرح لك</div>`;
     
@@ -985,216 +1055,45 @@ function saveMaintenanceMessage() {
 function switchAdminTab(tabId) { activeAdminTab = tabId; loadPage('admin'); }
 
 // ========================================
-// شات بوت متقدم
+// وظائف الواجهة
 // ========================================
-function setupPremiumChatbot() {
-    const trigger = document.getElementById('chatbotTrigger');
-    const window = document.getElementById('chatbotWindowUltra');
-    const closeBtn = document.getElementById('closeChatUltra');
-    const minimizeBtn = document.getElementById('minimizeChat');
-    const input = document.getElementById('chatbotInputUltra');
-    const sendBtn = document.getElementById('chatbotSendUltra');
-    const messagesDiv = document.getElementById('chatbotMessagesUltra');
-    const typingDiv = document.getElementById('chatbotTypingUltra');
-    
-    if (!trigger) return;
-    
-    trigger.onclick = () => {
-        window.classList.toggle('active');
-        if (window.classList.contains('active')) input.focus();
-    };
-    if (closeBtn) closeBtn.onclick = () => window.classList.remove('active');
-    if (minimizeBtn) minimizeBtn.onclick = () => window.classList.remove('active');
-    
-    const knowledge = {
-        greetings: ['مرحب', 'هلا', 'سلام', 'اهلا', 'hello', 'hi', 'مرحبا'],
-        about: ['من انت', 'وش اسمك', 'who are you', 'bot', 'روبوت'],
-        programming: ['برمجة', 'لغة برمجة', 'بايثون', 'جافا', 'javascript', 'html', 'css', 'كود'],
-        web: ['موقع', 'تصميم موقع', 'كيف اسوي موقع', 'استضافة', 'تطوير ويب'],
-        ai: ['ذكاء اصطناعي', 'ai', 'chatgpt', 'gemini'],
-        stats: ['احصائيات', 'زيارات', 'stats', 'إحصائيات', 'أرقام'],
-        theme: ['داكن', 'فاتح', 'ثيم', 'مظهر', 'لون', 'dark', 'light'],
-        contact: ['تواصل', 'اتصال', 'بريد', 'email', 'واتساب']
-    };
-    
-    const responses = {
-        greetings: ["✨ أهلاً وسهلاً! كيف أقدر أساعدك؟", "🤖 مرحباً بك! اسألني أي شيء.", "💫 يا هلا! تفضل اسأل وأنا أجاوبك."],
-        about: ["🤖 أنا AMAz Bot، مساعد ذكي متطور! اسألني أي شيء عن الموقع."],
-        programming: ["💻 أفضل لغة للمبتدئين هي Python. تريد شرحاً مفصلاً؟"],
-        web: ["🌐 لتصميم موقع: HTML، CSS، JavaScript. ترفعه مجاناً على Netlify."],
-        ai: ["🧠 الذكاء الاصطناعي يحاكي العقل البشري. أشهر النماذج: ChatGPT و Gemini."],
-        stats: [`📊 إجمالي الزيارات: ${siteData?.stats?.totalVisits || 0} | اليوم: ${siteData?.stats?.todayVisits || 0}`],
-        theme: ["🎨 اضغط على زر 🌙/☀️ في الأعلى. الوضع الحالي: " + (document.body.classList.contains('dark-mode') ? 'داكن' : 'فاتح')],
-        contact: [`📞 البريد: ${siteData?.contact?.email} | واتساب: ${siteData?.contact?.whatsapp}`]
-    };
-    
-    function getResponse(msg) {
-        const input = msg.toLowerCase();
-        for (let cat in knowledge) {
-            for (let word of knowledge[cat]) {
-                if (input.includes(word)) {
-                    const res = responses[cat];
-                    if (res) return res[Math.floor(Math.random() * res.length)];
-                }
-            }
-        }
-        return "🤔 سؤال عميق! هل تقصد في مجال البرمجة والتقنية؟ أنا متخصص في هذا المجال.";
-    }
-    
-    function addMessage(text, isUser) {
-        const div = document.createElement('div');
-        div.className = `message-${isUser ? 'user' : 'bot'}`;
-        const time = new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute:'2-digit' });
-        div.innerHTML = `<div class="message-avatar"><i class="fas fa-${isUser ? 'user' : 'robot'}"></i></div><div class="message-content"><div class="message-bubble">${text}</div><div class="message-time">${time}</div></div>`;
-        messagesDiv.appendChild(div);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-    
-    function sendMessage() {
-        const msg = input.value.trim();
-        if (!msg) return;
-        addMessage(msg, true);
-        input.value = '';
-        typingDiv.classList.add('active');
-        setTimeout(() => {
-            typingDiv.classList.remove('active');
-            addMessage(getResponse(msg), false);
-        }, 700);
-    }
-    
-    if (sendBtn) sendBtn.onclick = sendMessage;
-    if (input) input.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
-    
-    document.querySelectorAll('.suggestion-ultra').forEach(btn => {
-        btn.onclick = () => { input.value = btn.textContent; sendMessage(); };
-    });
-}
-
-// ========================================
-// مشغل موسيقى YouTube
-// ========================================
-let ytPlayer = null;
-let currentVideoIndex = 0;
-let isMusicPlaying = false;
-
-const playlist = [
-    { id: '5qap5aO4i9A', title: 'Lofi Hip Hop', artist: 'Chillhop' },
-    { id: 'jfKfPfyJRdk', title: 'Calm Piano', artist: 'Relax Daily' },
-    { id: 'DWcJFNfaw9c', title: 'Study Beats', artist: 'Lofi Girl' }
-];
-
-function loadYouTubeAPI() {
-    if (typeof YT === 'undefined') {
-        const tag = document.createElement('script');
-        tag.src = 'https://www.youtube.com/iframe_api';
-        document.head.appendChild(tag);
+function setupHamburger() {
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('nav-menu');
+    if (hamburger && navMenu) {
+        hamburger.onclick = () => { navMenu.classList.toggle('active'); hamburger.classList.toggle('active'); };
     }
 }
 
-function onYouTubeIframeAPIReady() {
-    ytPlayer = new YT.Player('youtubePlayer', {
-        height: '0', width: '0',
-        videoId: playlist[currentVideoIndex].id,
-        playerVars: { autoplay: 0, controls: 0, disablekb: 1 },
-        events: { onStateChange: onPlayerStateChange }
-    });
+function closeMenu() {
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('nav-menu');
+    if (navMenu && hamburger) { navMenu.classList.remove('active'); hamburger.classList.remove('active'); }
 }
 
-function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.ENDED) playNextTrack();
-}
-
-function playTrack(index) {
-    if (!ytPlayer) return;
-    currentVideoIndex = index;
-    ytPlayer.loadVideoById(playlist[currentVideoIndex].id);
-    ytPlayer.playVideo();
-    isMusicPlaying = true;
-    updateMusicInfo();
-    const playPauseBtn = document.getElementById('playPause');
-    if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-}
-
-function playNextTrack() {
-    currentVideoIndex = (currentVideoIndex + 1) % playlist.length;
-    playTrack(currentVideoIndex);
-}
-
-function playPrevTrack() {
-    currentVideoIndex = (currentVideoIndex - 1 + playlist.length) % playlist.length;
-    playTrack(currentVideoIndex);
-}
-
-function togglePlayPause() {
-    if (!ytPlayer) return;
-    if (isMusicPlaying) {
-        ytPlayer.pauseVideo();
-        isMusicPlaying = false;
-        document.getElementById('playPause').innerHTML = '<i class="fas fa-play"></i>';
-    } else {
-        ytPlayer.playVideo();
-        isMusicPlaying = true;
-        document.getElementById('playPause').innerHTML = '<i class="fas fa-pause"></i>';
+function addLanguageSelector() {
+    const navbar = document.querySelector('.navbar');
+    if (navbar && !document.getElementById('languageSelect')) {
+        const langDiv = document.createElement('div');
+        langDiv.className = 'language-selector';
+        langDiv.innerHTML = `<select id="languageSelect" onchange="changeLanguage(this.value)"><option value="ar" ${currentLang==='ar'?'selected':''}>🇸🇦 العربية</option><option value="en" ${currentLang==='en'?'selected':''}>🇬🇧 English</option><option value="fr" ${currentLang==='fr'?'selected':''}>🇫🇷 Français</option><option value="es" ${currentLang==='es'?'selected':''}>🇪🇸 Español</option></select>`;
+        navbar.appendChild(langDiv);
     }
 }
 
-function stopMusic() {
-    if (!ytPlayer) return;
-    ytPlayer.stopVideo();
-    isMusicPlaying = false;
-    document.getElementById('playPause').innerHTML = '<i class="fas fa-play"></i>';
-}
-
-function updateMusicInfo() {
-    const titleEl = document.querySelector('.music-title');
-    const artistEl = document.querySelector('.music-artist');
-    if (titleEl) titleEl.textContent = playlist[currentVideoIndex].title;
-    if (artistEl) artistEl.textContent = playlist[currentVideoIndex].artist;
-}
-
-function setupMusicPlayer() {
-    const musicToggle = document.getElementById('musicToggle');
-    const musicControls = document.querySelector('.music-controls');
-    const playPauseBtn = document.getElementById('playPause');
-    const prevBtn = document.getElementById('prevTrack');
-    const nextBtn = document.getElementById('nextTrack');
-    const stopBtn = document.getElementById('stopMusic');
-    
-    loadYouTubeAPI();
-    window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
-    
-    if (musicToggle && musicControls) {
-        musicToggle.onclick = () => musicControls.classList.toggle('active');
-    }
-    if (playPauseBtn) playPauseBtn.onclick = togglePlayPause;
-    if (prevBtn) prevBtn.onclick = playPrevTrack;
-    if (nextBtn) nextBtn.onclick = playNextTrack;
-    if (stopBtn) stopBtn.onclick = stopMusic;
-}
-
-// ========================================
-// إعدادات إضافية
-// ========================================
-function initParticles() {
-    if (typeof particlesJS !== 'undefined') {
-        particlesJS('particles-js', {
-            particles: {
-                number: { value: 80, density: { enable: true, value_area: 800 } },
-                color: { value: "#ffffff" },
-                shape: { type: "circle" },
-                opacity: { value: 0.5, random: true },
-                size: { value: 3, random: true },
-                line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.2, width: 1 },
-                move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out" }
-            },
-            interactivity: {
-                detect_on: "canvas",
-                events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true }
-            },
-            retina_detect: true
-        });
+function addThemeToggle() {
+    const navbar = document.querySelector('.navbar');
+    if (navbar && !document.getElementById('themeToggle')) {
+        const themeDiv = document.createElement('div');
+        themeDiv.className = 'theme-toggle-container';
+        themeDiv.innerHTML = `<button id="themeToggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>`;
+        navbar.appendChild(themeDiv);
     }
 }
+
+function changeLanguage(lang) { currentLang = lang; localStorage.setItem('amaz_language', lang); loadPage(currentPage); }
+function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('amaz_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); }
+function updateAllTexts() {}
 
 function setupSearch() {
     const searchToggle = document.getElementById('searchToggle');
@@ -1253,21 +1152,34 @@ function setupDarkModeFloat() {
     if (darkModeFloat) darkModeFloat.onclick = () => toggleTheme();
 }
 
+function setupScrollTop() {
+    const scrollTop = document.getElementById('scrollTop');
+    if (scrollTop) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        scrollTop.onclick = () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+    }
+}
+
 function initAOS() {
-    if (typeof AOS !== 'undefined') AOS.init({ duration: 800, once: true, offset: 100, easing: 'ease-in-out' });
+    if (typeof AOS !== 'undefined') {
+        AOS.init({ duration: 800, once: true, offset: 100, easing: 'ease-in-out' });
+    }
 }
 
 function hidePreloader() {
     const preloader = document.getElementById('preloader');
-    if (preloader) setTimeout(() => preloader.classList.add('hide'), 1000);
-}
-
-function setupCustomCursor() {
-    const cursorDot = document.querySelector('.cursor-dot');
-    const cursorOutline = document.querySelector('.cursor-outline');
-    if (cursorDot && cursorOutline) {
-        cursorDot.style.display = 'none';
-        cursorOutline.style.display = 'none';
+    if (preloader) {
+        setTimeout(() => {
+            preloader.classList.add('hide');
+        }, 1000);
     }
 }
 
@@ -1280,47 +1192,6 @@ function setupNotifications() {
         };
     }
 }
-
-// ========================================
-// وظائف الواجهة
-// ========================================
-function setupHamburger() {
-    const hamburger = document.getElementById('hamburger');
-    const navMenu = document.getElementById('nav-menu');
-    if (hamburger && navMenu) {
-        hamburger.onclick = () => { navMenu.classList.toggle('active'); hamburger.classList.toggle('active'); };
-    }
-}
-
-function closeMenu() {
-    const hamburger = document.getElementById('hamburger');
-    const navMenu = document.getElementById('nav-menu');
-    if (navMenu && hamburger) { navMenu.classList.remove('active'); hamburger.classList.remove('active'); }
-}
-
-function addLanguageSelector() {
-    const navbar = document.querySelector('.navbar');
-    if (navbar && !document.getElementById('languageSelect')) {
-        const langDiv = document.createElement('div');
-        langDiv.className = 'language-selector';
-        langDiv.innerHTML = `<select id="languageSelect" onchange="changeLanguage(this.value)"><option value="ar" ${currentLang==='ar'?'selected':''}>🇸🇦 العربية</option><option value="en" ${currentLang==='en'?'selected':''}>🇬🇧 English</option><option value="fr" ${currentLang==='fr'?'selected':''}>🇫🇷 Français</option><option value="es" ${currentLang==='es'?'selected':''}>🇪🇸 Español</option></select>`;
-        navbar.appendChild(langDiv);
-    }
-}
-
-function addThemeToggle() {
-    const navbar = document.querySelector('.navbar');
-    if (navbar && !document.getElementById('themeToggle')) {
-        const themeDiv = document.createElement('div');
-        themeDiv.className = 'theme-toggle-container';
-        themeDiv.innerHTML = `<button id="themeToggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>`;
-        navbar.appendChild(themeDiv);
-    }
-}
-
-function changeLanguage(lang) { currentLang = lang; localStorage.setItem('amaz_language', lang); loadPage(currentPage); }
-function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('amaz_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); }
-function updateAllTexts() {}
 
 // ========================================
 // ربط الدوال العامة
