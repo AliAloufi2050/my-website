@@ -7,40 +7,29 @@
     <meta name="keywords" content="AMA'z, منصة, إنجازات, مشاريع, تطوير, برمجة, تصميم">
     <meta name="author" content="AMA'z">
     <meta name="theme-color" content="#667eea">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>AMA'z | المنصة الإبداعية الفائقة</title>
     
-    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-    
-    <!-- Main CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Custom Cursor -->
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
 
-    <!-- Preloader -->
     <div class="preloader" id="preloader">
         <div class="preloader-content">
             <div class="preloader-ring"></div>
             <div class="preloader-text">AMA'z</div>
-            <div class="preloader-dots">
-                <span></span><span></span><span></span>
-            </div>
+            <div class="preloader-dots"><span></span><span></span><span></span></div>
         </div>
     </div>
 
-    <!-- Particles Background -->
     <div id="particles-js"></div>
 
-    <!-- Animated Background Gradients -->
     <div class="animated-bg">
         <div class="gradient-1"></div>
         <div class="gradient-2"></div>
@@ -48,23 +37,13 @@
         <div class="gradient-4"></div>
     </div>
 
-    <!-- ======================================== -->
-    <!-- شريط التنقل الفاخر -->
-    <!-- ======================================== -->
     <nav class="navbar glass" id="navbar">
         <div class="logo-wrapper" onclick="refreshPage()">
-            <div class="logo-icon">
-                <i class="fas fa-crown"></i>
-                <div class="logo-glow"></div>
-            </div>
+            <div class="logo-icon"><i class="fas fa-crown"></i><div class="logo-glow"></div></div>
             <div class="logo-text">AMA'z<span class="logo-dot">.</span></div>
         </div>
         
-        <div class="hamburger" id="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
         
         <ul class="nav-menu" id="nav-menu">
             <li><a href="#" onclick="loadPage('home')" class="nav-link"><i class="fas fa-home"></i><span>الرئيسية</span></a></li>
@@ -76,9 +55,7 @@
         </ul>
         
         <div class="controls-wrapper">
-            <div class="search-toggle" id="searchToggle">
-                <i class="fas fa-search"></i>
-            </div>
+            <div class="search-toggle" id="searchToggle"><i class="fas fa-search"></i></div>
             <div class="language-selector">
                 <select id="languageSelect" onchange="changeLanguage(this.value)">
                     <option value="ar">🇸🇦 العربية</option>
@@ -88,19 +65,12 @@
                 </select>
             </div>
             <div class="theme-toggle-container">
-                <button id="themeToggle" onclick="toggleTheme()">
-                    <i class="fas fa-moon"></i>
-                    <i class="fas fa-sun" style="display:none;"></i>
-                </button>
+                <button id="themeToggle" onclick="toggleTheme()"><i class="fas fa-moon"></i><i class="fas fa-sun" style="display:none;"></i></button>
             </div>
-            <div class="notification-bell" id="notificationBell">
-                <i class="fas fa-bell"></i>
-                <span class="notification-dot"></span>
-            </div>
+            <div class="notification-bell" id="notificationBell"><i class="fas fa-bell"></i><span class="notification-dot"></span></div>
         </div>
     </nav>
 
-    <!-- Search Bar -->
     <div class="search-overlay" id="searchOverlay">
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="ابحث عن إنجازات، مشاريع، تدوينات..." autocomplete="off">
@@ -109,31 +79,16 @@
         </div>
     </div>
 
-    <!-- ======================================== -->
-    <!-- المحتوى الرئيسي -->
-    <!-- ======================================== -->
     <main class="main-content">
         <div class="container glass premium-container" id="content-container" data-aos="fade-up">
-            <div class="loading-state">
-                <div class="spinner-ring"></div>
-                <p>جاري التحميل...</p>
-            </div>
+            <div class="loading-state"><div class="spinner-ring"></div><p>جاري التحميل...</p></div>
         </div>
     </main>
 
-    <!-- ======================================== -->
-    <!-- مشغل موسيقى YouTube -->
-    <!-- ======================================== -->
     <div class="music-player" id="musicPlayer">
-        <button class="music-toggle" id="musicToggle">
-            <i class="fas fa-music"></i>
-            <span class="music-pulse"></span>
-        </button>
+        <button class="music-toggle" id="musicToggle"><i class="fas fa-music"></i><span class="music-pulse"></span></button>
         <div class="music-controls">
-            <div class="music-info">
-                <span class="music-title">YouTube Music</span>
-                <span class="music-artist">تشغيل مباشر</span>
-            </div>
+            <div class="music-info"><span class="music-title">YouTube Music</span><span class="music-artist">تشغيل مباشر</span></div>
             <div class="music-buttons">
                 <button id="prevTrack"><i class="fas fa-backward"></i></button>
                 <button id="playPause"><i class="fas fa-play"></i></button>
@@ -143,32 +98,20 @@
         </div>
     </div>
 
-    <!-- YouTube Iframe API (مخفي) -->
     <div id="youtubePlayer" style="display:none;"></div>
 
-    <!-- ======================================== -->
-    <!-- شات بوت متقدم -->
-    <!-- ======================================== -->
     <div class="chatbot-ultra" id="chatbotUltra">
         <div class="chatbot-trigger" id="chatbotTrigger">
-            <div class="pulse-ring"></div>
-            <div class="ripple-effect"></div>
-            <i class="fas fa-robot"></i>
-            <div class="chatbot-status online"></div>
+            <div class="pulse-ring"></div><div class="ripple-effect"></div>
+            <i class="fas fa-robot"></i><div class="chatbot-status online"></div>
             <span class="chatbot-tooltip">اسألني أي شيء!</span>
         </div>
         
         <div class="chatbot-window-ultra" id="chatbotWindowUltra">
             <div class="chatbot-header-ultra">
                 <div class="chatbot-header-info">
-                    <div class="chatbot-avatar-ultra">
-                        <i class="fas fa-robot"></i>
-                        <div class="avatar-pulse"></div>
-                    </div>
-                    <div>
-                        <h4>AMAz AI <span class="verified"><i class="fas fa-check-circle"></i></span></h4>
-                        <p>ذكاء اصطناعي متقدم | Gemini AI Engine</p>
-                    </div>
+                    <div class="chatbot-avatar-ultra"><i class="fas fa-robot"></i><div class="avatar-pulse"></div></div>
+                    <div><h4>AMAz AI <span class="verified"><i class="fas fa-check-circle"></i></span></h4><p>ذكاء اصطناعي متقدم | Gemini AI Engine</p></div>
                 </div>
                 <div class="chatbot-actions">
                     <button class="minimize-btn" id="minimizeChat"><i class="fas fa-minus"></i></button>
@@ -180,24 +123,13 @@
                 <div class="message-bot">
                     <div class="message-avatar"><i class="fas fa-robot"></i></div>
                     <div class="message-content">
-                        <div class="message-bubble">
-                            ✨ <strong>مرحباً بك في AMA'z Elite!</strong><br><br>
-                            أنا مساعدك الذكي المتطور. أستطيع:<br>
-                            • الإجابة عن أسئلة البرمجة والتقنية<br>
-                            • إدارة المحتوى والموقع<br>
-                            • تحليل البيانات والإحصائيات<br>
-                            • تقديم نصائح التطوير<br><br>
-                            كيف أقدر أساعدك اليوم؟ 🚀
-                        </div>
+                        <div class="message-bubble">✨ <strong>مرحباً بك في AMA'z Elite!</strong><br><br>أنا مساعدك الذكي المتطور. كيف أقدر أساعدك اليوم؟ 🚀</div>
                         <div class="message-time">الآن</div>
                     </div>
                 </div>
             </div>
             
-            <div class="chatbot-typing-ultra" id="chatbotTypingUltra">
-                <span></span><span></span><span></span>
-                <span class="typing-text">AMAz AI يكتب...</span>
-            </div>
+            <div class="chatbot-typing-ultra" id="chatbotTypingUltra"><span></span><span></span><span></span><span class="typing-text">AMAz AI يكتب...</span></div>
             
             <div class="chatbot-input-ultra">
                 <div class="suggestions-grid" id="suggestionsGrid">
@@ -210,39 +142,26 @@
                 </div>
                 <div class="input-wrapper-ultra">
                     <input type="text" id="chatbotInputUltra" placeholder="اكتب سؤالك هنا..." autocomplete="off">
-                    <button id="chatbotSendUltra">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                    <button id="voiceInputBtn">
-                        <i class="fas fa-microphone"></i>
-                    </button>
+                    <button id="chatbotSendUltra"><i class="fas fa-paper-plane"></i></button>
+                    <button id="voiceInputBtn"><i class="fas fa-microphone"></i></button>
                 </div>
-                <div class="chatbot-footer">
-                    <span><i class="fas fa-shield-alt"></i> مدعوم بـ Gemini AI</span>
-                    <span><i class="fas fa-lock"></i> آمن 100%</span>
-                </div>
+                <div class="chatbot-footer"><span><i class="fas fa-shield-alt"></i> مدعوم بـ Gemini AI</span><span><i class="fas fa-lock"></i> آمن 100%</span></div>
             </div>
         </div>
     </div>
 
-    <!-- ======================================== -->
-    <!-- تذييل فاخر -->
-    <!-- ======================================== -->
     <footer class="footer glass">
         <div class="footer-content">
             <div class="footer-section" data-aos="fade-up">
-                <div class="footer-logo">
-                    <i class="fas fa-crown"></i>
-                    <span>AMA'z</span>
-                </div>
+                <div class="footer-logo"><i class="fas fa-crown"></i><span>AMA'z</span></div>
                 <p>منصة إبداعية متكاملة للإنجازات والمشاريع التقنية والفنية. نهدف للإلهام والتميز.</p>
                 <div class="social-links">
-                    <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
-                    <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
-                    <a href="#" target="_blank"><i class="fab fa-github"></i></a>
-                    <a href="#" target="_blank"><i class="fab fa-linkedin"></i></a>
-                    <a href="#" target="_blank"><i class="fab fa-youtube"></i></a>
-                    <a href="#" target="_blank"><i class="fab fa-discord"></i></a>
+                    <a href="https://www.instagram.com/ali.aloufi.5682" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.tiktok.com/@ali.aloufi.5682" target="_blank"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://pin.it/3tM3teNqF" target="_blank"><i class="fab fa-pinterest"></i></a>
+                    <a href="https://www.facebook.com/share/1GFryULqXA/" target="_blank"><i class="fab fa-facebook"></i></a>
+                    <a href="https://www.youtube.com/@ali.aloufi.5682" target="_blank"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.linkedin.com/in/ali-aloufi-7590103b7" target="_blank"><i class="fab fa-linkedin"></i></a>
                 </div>
             </div>
             <div class="footer-section" data-aos="fade-up" data-aos-delay="100">
@@ -272,8 +191,8 @@
                     <button><i class="fas fa-paper-plane"></i></button>
                 </div>
                 <div class="contact-info">
-                    <p><i class="fas fa-envelope"></i> info@amaz.com</p>
-                    <p><i class="fas fa-phone"></i> +966 5X XXX XXXX</p>
+                    <p><i class="fas fa-envelope"></i> ali.aloufi@amaz.com</p>
+                    <p><i class="fas fa-phone"></i> +966 XX XXX XXXX</p>
                 </div>
             </div>
         </div>
@@ -287,25 +206,12 @@
         </div>
     </footer>
 
-    <!-- ======================================== -->
-    <!-- أزرار جانبية -->
-    <!-- ======================================== -->
     <div class="floating-buttons">
-        <div class="floating-btn" id="scrollTop">
-            <i class="fas fa-arrow-up"></i>
-            <span class="tooltip">العودة للأعلى</span>
-        </div>
-        <div class="floating-btn" id="darkModeFloat">
-            <i class="fas fa-moon"></i>
-            <span class="tooltip">الوضع الداكن</span>
-        </div>
-        <div class="floating-btn" id="shareBtn">
-            <i class="fas fa-share-alt"></i>
-            <span class="tooltip">مشاركة الموقع</span>
-        </div>
+        <div class="floating-btn" id="scrollTop"><i class="fas fa-arrow-up"></i><span class="tooltip">العودة للأعلى</span></div>
+        <div class="floating-btn" id="darkModeFloat"><i class="fas fa-moon"></i><span class="tooltip">الوضع الداكن</span></div>
+        <div class="floating-btn" id="shareBtn"><i class="fas fa-share-alt"></i><span class="tooltip">مشاركة الموقع</span></div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
