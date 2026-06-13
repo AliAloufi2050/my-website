@@ -1,6 +1,6 @@
 // ========================================
 // AMA'z ULTRA - المنصة الفائقة الاحترافية
-// الإصدار 6.0 - الكود الكامل والمتكامل
+// الإصدار 6.0 - مع سياسة الخصوصية وشروط الاستخدام والدعم الفني
 // ========================================
 
 // ========================================
@@ -243,7 +243,6 @@ function loadPage(page) {
                 <p>${siteData.contact.message}</p>
                 
                 <div class="contact-grid">
-                    <!-- نموذج الاتصال -->
                     <div class="contact-form">
                         <h3>✉️ أرسل رسالة</h3>
                         <form id="contactForm">
@@ -256,7 +255,6 @@ function loadPage(page) {
                         </form>
                     </div>
                     
-                    <!-- معلومات التواصل -->
                     <div class="contact-info">
                         <h3>📌 معلومات سريعة</h3>
                         <ul>
@@ -270,7 +268,6 @@ function loadPage(page) {
             </div>
         `;
         
-        // إضافة حدث إرسال النموذج بعد تحميل الصفحة
         setTimeout(() => {
             const form = document.getElementById('contactForm');
             if (form) {
@@ -291,7 +288,6 @@ function loadPage(page) {
                     statusDiv.innerHTML = 'جاري الإرسال...';
                     statusDiv.className = 'form-status';
                     
-                    // حفظ الرسالة في localStorage
                     const newMessage = {
                         id: Date.now(),
                         name: name,
@@ -310,7 +306,6 @@ function loadPage(page) {
                     statusDiv.className = 'form-status success';
                     form.reset();
                     
-                    // مسح رسالة النجاح بعد 5 ثواني
                     setTimeout(() => {
                         if (statusDiv) {
                             statusDiv.innerHTML = '';
@@ -320,6 +315,179 @@ function loadPage(page) {
                 };
             }
         }, 100);
+    } else if (page === 'privacy') {
+        html = `
+            <div class="legal-page">
+                <h1>🔒 سياسة الخصوصية</h1>
+                <p class="last-updated">آخر تحديث: 1 يناير 2024</p>
+                
+                <div class="legal-section">
+                    <h2>📌 مقدمة</h2>
+                    <p>نحن في AMA'z نضع خصوصية بياناتك على رأس أولوياتنا. توضح سياسة الخصوصية هذه كيفية جمع واستخدام وحماية معلوماتك الشخصية عند زيارة موقعنا.</p>
+                </div>
+                
+                <div class="legal-section">
+                    <h2>📊 المعلومات التي نجمعها</h2>
+                    <p>قد نجمع الأنواع التالية من المعلومات:</p>
+                    <ul>
+                        <li><strong>معلومات الحساب:</strong> الاسم، البريد الإلكتروني، اسم المستخدم عند التسجيل.</li>
+                        <li><strong>معلومات الاستخدام:</strong> الصفحات التي تزورها، الوقت الذي تقضيه على الموقع.</li>
+                        <li><strong>معلومات التقنية:</strong> عنوان IP، نوع المتصفح، نظام التشغيل.</li>
+                        <li><strong>الرسائل:</strong> المحتوى الذي ترسله عبر نموذج الاتصال.</li>
+                    </ul>
+                </div>
+                
+                <div class="legal-section">
+                    <h2>🔐 كيف نستخدم معلوماتك</h2>
+                    <p>نستخدم المعلومات التي نجمعها للأغراض التالية:</p>
+                    <ul>
+                        <li>تقديم وتحسين خدماتنا.</li>
+                        <li>التواصل معك والرد على استفساراتك.</li>
+                        <li>تحسين تجربة المستخدم وتحليل أداء الموقع.</li>
+                        <li>حماية موقعنا من النشاطات غير القانونية.</li>
+                    </ul>
+                </div>
+                
+                <div class="legal-section">
+                    <h2>🍪 ملفات تعريف الارتباط (Cookies)</h2>
+                    <p>نستخدم ملفات تعريف الارتباط لتحسين تجربتك على موقعنا. يمكنك التحكم في إعدادات cookies من خلال متصفحك.</p>
+                </div>
+                
+                <div class="legal-section">
+                    <h2>🔗 روابط خارجية</h2>
+                    <p>قد يحتوي موقعنا على روابط لمواقع خارجية. نحن غير مسؤولين عن ممارسات الخصوصية لتلك المواقع.</p>
+                </div>
+                
+                <div class="legal-section">
+                    <h2>👦 خصوصية الأطفال</h2>
+                    <p>موقعنا لا يستهدف الأطفال تحت سن 13 عاماً. نحن لا نجمع معلومات عن قصد من الأطفال.</p>
+                </div>
+                
+                <div class="legal-section">
+                    <h2>📧 الاتصال بنا</h2>
+                    <p>إذا كان لديك أي أسئلة حول سياسة الخصوصية، يرجى التواصل معنا عبر:</p>
+                    <p>📧 البريد الإلكتروني: <a href="mailto:${siteData.contact.email}">${siteData.contact.email}</a></p>
+                </div>
+            </div>
+        `;
+    } else if (page === 'terms') {
+        html = `
+            <div class="legal-page">
+                <h1>📜 شروط الاستخدام</h1>
+                <p class="last-updated">آخر تحديث: 1 يناير 2024</p>
+                
+                <div class="legal-section">
+                    <h2>📌 قبول الشروط</h2>
+                    <p>باستخدامك لهذا الموقع، فإنك توافق على الالتزام بشروط الاستخدام هذه. إذا كنت لا توافق على أي جزء من هذه الشروط، يرجى عدم استخدام موقعنا.</p>
+                </div>
+                
+                <div class="legal-section">
+                    <h2>🔐 إنشاء حساب</h2>
+                    <p>عند إنشاء حساب على موقعنا، أنت مسؤول عن:</p>
+                    <ul>
+                        <li>الحفاظ على سرية معلومات حسابك.</li>
+                        <li>جميع الأنشطة التي تحدث تحت حسابك.</li>
+                        <li>إبلاغنا فوراً عن أي اختراق أمني.</li>
+                    </ul>
+                </div>
+                
+                <div class="legal-section">
+                    <h2>📝 المحتوى</h2>
+                    <p>جميع المحتويات المنشورة على هذا الموقع (بما في ذلك النصوص والصور والتصاميم) هي ملك لـ AMA'z أو مرخصة لنا. لا يجوز نسخ أو توزيع أو استخدام أي محتوى بدون إذن كتابي مسبق.</p>
+                </div>
+                
+                <div class="legal-section">
+                    <h2>🚫 السلوك الممنوع</h2>
+                    <p>يُمنع استخدام الموقع للأغراض التالية:</p>
+                    <ul>
+                        <li>نشر محتوى غير قانوني أو مسيء أو ضار.</li>
+                        <li>محاولة اختراق أمن الموقع أو حسابات المستخدمين.</li>
+                        <li>إرسال رسائل غير مرغوب فيها (Spam).</li>
+                        <li>انتحال شخصية آخرين.</li>
+                    </ul>
+                </div>
+                
+                <div class="legal-section">
+                    <h2>⚖️ إخلاء المسؤولية</h2>
+                    <p>نحن لا نضمن أن الموقع سيكون متاحاً دون انقطاع أو خالياً من الأخطاء. نقدم الموقع "كما هو" دون أي ضمانات.</p>
+                </div>
+                
+                <div class="legal-section">
+                    <h2>📧 الاتصال بنا</h2>
+                    <p>للاستفسارات حول شروط الاستخدام، يرجى التواصل معنا عبر:</p>
+                    <p>📧 البريد الإلكتروني: <a href="mailto:${siteData.contact.email}">${siteData.contact.email}</a></p>
+                </div>
+            </div>
+        `;
+    } else if (page === 'support') {
+        html = `
+            <div class="legal-page">
+                <h1>🆘 الدعم الفني</h1>
+                
+                <div class="legal-section">
+                    <h2>📞 كيف يمكننا مساعدتك؟</h2>
+                    <p>نحن هنا لمساعدتك في أي استفسار أو مشكلة تواجهك أثناء استخدام موقع AMA'z.</p>
+                </div>
+                
+                <div class="support-grid">
+                    <div class="support-card">
+                        <i class="fas fa-envelope"></i>
+                        <h3>البريد الإلكتروني</h3>
+                        <p>للأسئلة العامة والدعم الفني</p>
+                        <a href="mailto:${siteData.contact.email}" class="support-btn">${siteData.contact.email}</a>
+                    </div>
+                    
+                    <div class="support-card">
+                        <i class="fab fa-whatsapp"></i>
+                        <h3>واتساب</h3>
+                        <p>للتواصل السريع والاستفسارات</p>
+                        <a href="https://wa.me/${siteData.contact.whatsapp.replace(/[^0-9]/g, '')}" target="_blank" class="support-btn">${siteData.contact.whatsapp}</a>
+                    </div>
+                    
+                    <div class="support-card">
+                        <i class="fab fa-twitter"></i>
+                        <h3>تويتر</h3>
+                        <p>للتواصل والتحديثات السريعة</p>
+                        <a href="https://twitter.com/${siteData.contact.twitter.replace('@', '')}" target="_blank" class="support-btn">${siteData.contact.twitter}</a>
+                    </div>
+                </div>
+                
+                <div class="legal-section">
+                    <h2>❓ الأسئلة الشائعة</h2>
+                    
+                    <div class="faq-item">
+                        <h3>💡 كيف يمكنني إنشاء حساب؟</h3>
+                        <p>اضغط على "لوحة القيادة" ثم "إنشاء حساب جديد" واملأ البيانات المطلوبة.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <h3>💡 كيف يمكنني إضافة إنجاز أو مشروع؟</h3>
+                        <p>بعد تسجيل الدخول، اذهب إلى لوحة القيادة → إدارة المحتوى → أضف الإنجازات أو المشاريع.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <h3>💡 نسيت كلمة المرور، ماذا أفعل؟</h3>
+                        <p>تواصل مع الدعم الفني عبر البريد الإلكتروني أو واتساب لمساعدتك في استعادة حسابك.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <h3>💡 كيف يمكنني تغيير لون الموقع (الوضع الداكن)؟</h3>
+                        <p>اضغط على زر 🌙/☀️ في أعلى الشاشة للتبديل بين الوضع الفاتح والداكن.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <h3>💡 هل موقعي آمن؟</h3>
+                        <p>نعم، نستخدم أحدث تقنيات التشفير والحماية لضمان أمان بياناتك.</p>
+                    </div>
+                </div>
+                
+                <div class="legal-section contact-support">
+                    <h2>📧 لم يتم حل مشكلتك؟</h2>
+                    <p>تواصل معنا مباشرة وسنرد عليك في أقرب وقت</p>
+                    <button onclick="loadPage('contact')" class="support-contact-btn">📞 اذهب إلى صفحة الاتصال</button>
+                </div>
+            </div>
+        `;
     } else if (page === 'admin') {
         html = currentUser ? showAdminDashboard() : showLoginForm();
     }
@@ -431,7 +599,7 @@ function logout() {
 }
 
 // ========================================
-// لوحة القيادة
+// لوحة القيادة (مختصرة للطول)
 // ========================================
 function showAdminDashboard() {
     if (!currentUser) return showLoginForm();
@@ -568,6 +736,9 @@ function deleteUser(userId) {
     }
 }
 
+// ========================================
+// إدارة المحتوى (مختصرة للطول)
+// ========================================
 function showContentManagement() {
     if (!hasPermission('manage_content') && !hasPermission('edit_content') && currentUser?.role !== 'owner') {
         return `<div style="text-align:center; padding:50px; color:red;">⛔ غير مصرح لك</div>`;
@@ -732,6 +903,9 @@ function deleteBlogPost(id) {
     }
 }
 
+// ========================================
+// إدارة الوارد
+// ========================================
 function showCommentsAndIncoming() {
     if (!hasPermission('manage_inbox') && currentUser?.role !== 'owner') return `<div style="text-align:center; padding:50px; color:red;">⛔ غير مصرح لك</div>`;
     
@@ -1091,16 +1265,10 @@ function hidePreloader() {
 function setupCustomCursor() {
     const cursorDot = document.querySelector('.cursor-dot');
     const cursorOutline = document.querySelector('.cursor-outline');
-    if (!cursorDot || !cursorOutline) return;
-    document.addEventListener('mousemove', (e) => {
-        cursorDot.style.transform = `translate(${e.clientX - 4}px, ${e.clientY - 4}px)`;
-        cursorOutline.style.transform = `translate(${e.clientX - 20}px, ${e.clientY - 20}px)`;
-    });
-    const hoverElements = document.querySelectorAll('a, button, .nav-link, .suggestion-ultra, .floating-btn');
-    hoverElements.forEach(el => {
-        el.addEventListener('mouseenter', () => { cursorDot.classList.add('hover'); cursorOutline.classList.add('hover'); });
-        el.addEventListener('mouseleave', () => { cursorDot.classList.remove('hover'); cursorOutline.classList.remove('hover'); });
-    });
+    if (cursorDot && cursorOutline) {
+        cursorDot.style.display = 'none';
+        cursorOutline.style.display = 'none';
+    }
 }
 
 function setupNotifications() {
